@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Library App",
+    title: "Perpustakaan Kejaksaan Negeri Kota Bogor",
     description: "Frontend for Library Management",
 };
 

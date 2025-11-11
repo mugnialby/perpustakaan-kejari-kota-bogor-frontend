@@ -44,25 +44,41 @@ export default function DashboardSidebarComponent({showSidebar, setShowSidebar})
                                 Buku
                             </button>
                             <button
-                                onClick={() => router.push("/admin/dashboard/master/anggota")}
+                                onClick={() => router.push("/admin/dashboard/master/kategori")}
                                 className={`block w-full text-left px-3 py-2 rounded-lg transition ${isActive(
-                                    "/admin/dashboard/master/anggota"
+                                    "/admin/dashboard/master/kategori"
                                 )}`}
                             >
-                                Anggota
+                                Kategori
                             </button>
+                            <button
+                                onClick={() => router.push("/admin/dashboard/master/rak")}
+                                className={`block w-full text-left px-3 py-2 rounded-lg transition ${isActive(
+                                    "/admin/dashboard/master/rak"
+                                )}`}
+                            >
+                                Rak
+                            </button>
+                            {/* <button
+                                onClick={() => router.push("/admin/dashboard/master/pengguna")}
+                                className={`block w-full text-left px-3 py-2 rounded-lg transition ${isActive(
+                                    "/admin/dashboard/master/pengguna"
+                                )}`}
+                            >
+                                Pengguna
+                            </button> */}
                         </div>
                     </div>
 
                     {/* Pinjam */}
-                    <button
+                    {/* <button
                         onClick={() => router.push("/admin/pinjam")}
                         className={`w-full text-left px-4 py-2 rounded-lg transition text-gray-900 ${isActive(
                             "/admin/pinjam"
                         )}`}
                     >
                         Pinjam
-                    </button>
+                    </button> */}
                 </nav>
             </aside>
 

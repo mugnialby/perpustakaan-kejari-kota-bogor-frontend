@@ -1,23 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Menu, LogOut } from "lucide-react";
 
 export default function DashboardNavbarComponent({ showSidebar, setShowSidebar }) {
     const router = useRouter();
-    const [user, setUser] = useState<{ name: string } | null>(null);
+    const [user, setUser] = useState("");
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            setUser(storedUser);
         }
     }, []);
+    
+    // Check already login session
+    const removeSessionData = () => {
+        localStorage.clear()
+        router.push("/main/login")
+    };
+
     return (
         <>
             {/* Top Navbar */}
-            <header className="flex items-center justify-between bg-white shadow px-6 py-4">
+            <header className="flex items-center justify-between bg-green-100 shadow px-6 py-4">
                 <div className="flex items-center gap-3">
                     <button
                         className="md:hidden"
@@ -31,11 +38,11 @@ export default function DashboardNavbarComponent({ showSidebar, setShowSidebar }
                 </div>
                 <div className="flex items-center gap-6">
                     <span className="uppercase font-semibold text-gray-700">
-                        Hi, {user?.name || "ADMIN"}
+                        Hi, {user || "ADMIN"}
                     </span>
                     <button
-                        onClick={() => router.push("/main/login")}
-                        className="flex items-center gap-2 text-gray-600 hover:text-black"
+                        onClick={() => removeSessionData()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-green-600"
                     >
                         <LogOut size={18} /> Logout
                     </button>
