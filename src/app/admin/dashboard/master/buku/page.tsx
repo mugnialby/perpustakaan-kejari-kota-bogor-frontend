@@ -21,8 +21,15 @@ export default function MasterBuku() {
     // 🆕 new states for combobox
     const [categories, setCategories] = useState<any[]>([]);
     const [racks, setRacks] = useState<any[]>([]);
+    const [publishers, setPublishers] = useState<any[]>([]);
+    const [libraryItemTypes, setLibraryItemTypes] = useState<any[]>([]);
+    const [libraryItemOrigins, setLibraryItemOrigins] = useState<any[]>([]);
+
     const [selectedCategory, setSelectedCategory] = useState<any>(null);
     const [selectedRack, setSelectedRack] = useState<any>(null);
+    const [selectedPublisher, setSelectedPublisher] = useState<any>(null);
+    const [selectedLibraryItemType, setSelectedLibraryItemType] = useState<any>(null);
+    const [selectedLibraryItemOrigin, setSelectedLibraryItemOrigin] = useState<any>(null);
 
     // 🆕 new state for uploaded image
     const [listBookAttachment, setListBookAttachment] = useState<any[]>([]);
@@ -33,12 +40,18 @@ export default function MasterBuku() {
     const API_URL = "http://192.168.50.52:8080/api/master/books/";
     const CATEGORY_API = "http://192.168.50.52:8080/api/master/categories/";
     const RACK_API = "http://192.168.50.52:8080/api/master/racks/";
+    const PUBLISHER_API = "http://192.168.50.52:8080/api/master/publishers/";
+    const LIBRARY_ITEM_TYPE_API = "http://192.168.50.52:8080/api/master/libraryItemTypes/";
+    const LIBRARY_ITEM_ORIGIN_API = "http://192.168.50.52:8080/api/master/libraryItemOrigins/";
 
     /* CONSTRUCTOR FUNCTIONS */
     useEffect(() => {
         getAllBooks();
         getAllCategories();
         getAllRacks();
+        getAllPublishers();
+        getAllLibraryItemType();
+        getAllLibraryItemOrigin();
     }, []);
 
     // ✅ Fetch books, categories, and racks
@@ -66,6 +79,33 @@ export default function MasterBuku() {
             setRacks(response.data.data);
         } catch (error) {
             console.error("Error fetching racks:", error);
+        }
+    };
+
+    const getAllPublishers = async () => {
+        try {
+            const response = await axios.get(PUBLISHER_API);
+            setPublishers(response.data.data);
+        } catch (error) {
+            console.error("Error fetching publishers:", error);
+        }
+    };
+
+    const getAllLibraryItemType = async () => {
+        try {
+            const response = await axios.get(LIBRARY_ITEM_TYPE_API);
+            setLibraryItemTypes(response.data.data);
+        } catch (error) {
+            console.error("Error fetching library item types:", error);
+        }
+    };
+
+    const getAllLibraryItemOrigin = async () => {
+        try {
+            const response = await axios.get(LIBRARY_ITEM_ORIGIN_API);
+            setLibraryItemOrigins(response.data.data);
+        } catch (error) {
+            console.error("Error fetching library item origins:", error);
         }
     };
 
@@ -229,6 +269,11 @@ export default function MasterBuku() {
         label: r.rackName,
     }));
 
+    const Options = racks.map((r) => ({
+        value: r.id,
+        label: r.rackName,
+    }));
+
     const changePage = (page: number) => {
         if (page >= 1 && page <= totalPages) setCurrentPage(page);
     };
@@ -300,10 +345,14 @@ export default function MasterBuku() {
                         <tr>
                             <th className="px-3 py-2 text-left">No.</th>
                             <th className="px-3 py-2 text-left">Judul</th>
+                            <th className="px-3 py-2 text-left">Jenis Pustaka</th>
                             <th className="px-3 py-2 text-left">Penulis</th>
+                            <th className="px-3 py-2 text-left">Tempat Terbit</th>
+                            <th className="px-3 py-2 text-left">Penerbit</th>
                             <th className="px-3 py-2 text-left">Tahun Terbit</th>
                             <th className="px-3 py-2 text-left">Kategori</th>
                             <th className="px-3 py-2 text-left">Rak - Baris</th>
+                            <th className="px-3 py-2 text-left">Asal Pustaka</th>
                             <th className="px-3 py-2 text-left">Aksi</th>
                         </tr>
                     </thead>
@@ -321,10 +370,14 @@ export default function MasterBuku() {
                                     >
                                         <td className="px-3 py-2">{idx + 1}</td>
                                         <td className="px-3 py-2">{book.title}</td>
+                                        <td className="px-3 py-2">{book.libraryItemType.libraryItemTypeName}</td>
                                         <td className="px-3 py-2">{book.author}</td>
+                                        <td className="px-3 py-2">{book.publishLocation}</td>
+                                        <td className="px-3 py-2">{book.publisher.publisherName}</td>
                                         <td className="px-3 py-2">{book.publishedYear}</td>
                                         <td className="px-3 py-2">{book.category.categoryName}</td>
                                         <td className="px-3 py-2">{book.rack.rackName + " - " + book.rackRow}</td>
+                                        <td className="px-3 py-2">{book.libraryItemOrigin.libraryItemOriginName}</td>
                                         <td className="px-3 py-2 flex gap-2">
                                             <button
                                                 onClick={() => handleDetail(book)}
@@ -349,7 +402,7 @@ export default function MasterBuku() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-6 text-gray-500 italic bg-gray-50">
+                                    <td colSpan={11} className="text-center py-6 text-gray-500 italic bg-gray-50">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -425,7 +478,7 @@ export default function MasterBuku() {
             <AnimatePresence>
                 {showPopup && (
                     <motion.div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -434,132 +487,177 @@ export default function MasterBuku() {
                             initial={{ scale: 0.8 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.8 }}
-                            className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6"
+                            className="bg-white rounded-xl shadow-xl w-[90%] max-w-6xl max-h-[90vh] overflow-y-auto p-8"
                         >
-                            <h2 className="text-lg font-bold mb-4 text-black">
+                            <h2 className="text-xl font-bold mb-6 text-black">
                                 {isEditing ? "Ubah Buku" : "Tambah Buku"}
                             </h2>
-                            <form onSubmit={handleSubmitBook} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-black">Judul</label>
-                                    <input
-                                        name="title"
-                                        defaultValue={editingBook?.title || ""}
-                                        required
-                                        className="w-full border px-3 py-2 rounded-lg text-black"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-black">Penulis</label>
-                                    <input
-                                        name="author"
-                                        defaultValue={editingBook?.author || ""}
-                                        required
-                                        className="w-full border px-3 py-2 rounded-lg text-black"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-black">Tahun Terbit</label>
-                                    <input
-                                        type="number"
-                                        name="publishedYear"
-                                        defaultValue={editingBook?.publishedYear || ""}
-                                        required
-                                        className="w-full border px-3 py-2 rounded-lg text-black"
-                                    />
+
+                            <form onSubmit={handleSubmitBook} className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                                {/* ================= LEFT SIDE (DATA ENTRY) ================= */}
+                                <div className="md:col-span-2 grid grid-cols-2 gap-4 w-full">
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-black">Judul</label>
+                                        <input
+                                            name="title"
+                                            defaultValue={editingBook?.title || ""}
+                                            required
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* 🆕 Category select (searchable) */}
-                                <div>
-                                    <label className="block text-sm font-medium text-black">
-                                        Kategori
-                                    </label>
-                                    <Select
-                                        options={categoryOptions}
-                                        value={selectedCategory}
-                                        onChange={setSelectedCategory}
-                                        placeholder="Pilih Kategori..."
-                                        className="text-black"
-                                        isSearchable
-                                    />
+                                <div className="md:col-span-2 grid grid-cols-2 gap-4 w-full">
+                                    {/* Kategori */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Jenis Pustaka</label>
+                                        <Select
+                                            options={categoryOptions}
+                                            value={selectedCategory}
+                                            onChange={setSelectedCategory}
+                                            placeholder="Pilih Kategori..."
+                                            className="text-black"
+                                            isSearchable
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Penulis</label>
+                                        <input
+                                            name="author"
+                                            defaultValue={editingBook?.author || ""}
+                                            required
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Tempat Terbit</label>
+                                        <input
+                                            name="author"
+                                            defaultValue={editingBook?.author || ""}
+                                            required
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+                                    </div>
+
+                                    {/* Kategori */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Penerbit</label>
+                                        <Select
+                                            options={categoryOptions}
+                                            value={selectedCategory}
+                                            onChange={setSelectedCategory}
+                                            placeholder="Pilih Kategori..."
+                                            className="text-black"
+                                            isSearchable
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Tahun Terbit</label>
+                                        <input
+                                            type="number"
+                                            name="publishedYear"
+                                            defaultValue={editingBook?.publishedYear || ""}
+                                            required
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+                                    </div>
+
+                                    {/* Kategori */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Kategori</label>
+                                        <Select
+                                            options={categoryOptions}
+                                            value={selectedCategory}
+                                            onChange={setSelectedCategory}
+                                            placeholder="Pilih Kategori..."
+                                            className="text-black"
+                                            isSearchable
+                                        />
+                                    </div>
+
+                                    {/* Rak */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Rak</label>
+                                        <Select
+                                            options={rackOptions}
+                                            value={selectedRack}
+                                            onChange={setSelectedRack}
+                                            placeholder="Pilih Rak..."
+                                            className="text-black"
+                                            isSearchable
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Baris</label>
+                                        <input
+                                            type="number"
+                                            name="rackRow"
+                                            defaultValue={editingBook?.rackRow || ""}
+                                            required
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-black">Asal Pustaka</label>
+                                        <Select
+                                            options={rackOptions}
+                                            value={selectedRack}
+                                            onChange={setSelectedRack}
+                                            placeholder="Pilih Rak..."
+                                            className="text-black"
+                                            isSearchable
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* 🆕 Rack select (searchable) */}
-                                <div>
-                                    <label className="block text-sm font-medium text-black">
-                                        Rak
-                                    </label>
-                                    <Select
-                                        options={rackOptions}
-                                        value={selectedRack}
-                                        onChange={setSelectedRack}
-                                        placeholder="Pilih Rak..."
-                                        className="text-black"
-                                        isSearchable
-                                    />
+                                <div className="md:col-span-2 grid grid-cols-2 gap-4 w-full">
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-black">Foto Buku</label>
+                                        <input
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            multiple
+                                            onChange={handleImageUpload}
+                                            className="w-full border px-3 py-2 rounded-lg text-black"
+                                        />
+
+                                        {listBookAttachment.length > 0 && (
+                                            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                                {listBookAttachment
+                                                    .filter((img) => !img.isDelete)
+                                                    .map((img, idx) => (
+                                                        <div key={idx} className="relative">
+                                                            <img
+                                                                src={formatImageSrc(img.fileBase64)}
+                                                                alt={`preview-${idx}`}
+                                                                className="h-32 w-full object-cover rounded-lg border"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setListBookAttachment((prev) => {
+                                                                        const updated = [...prev];
+                                                                        const target = updated[idx];
+                                                                        if (target.isNew) return updated.filter((_, i) => i !== idx);
+                                                                        updated[idx] = { ...target, isDelete: true };
+                                                                        return updated;
+                                                                    });
+                                                                }}
+                                                                className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 text-xs"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-black">Baris</label>
-                                    <input
-                                        type="number"
-                                        name="rackRow"
-                                        defaultValue={editingBook?.rackRow || ""}
-                                        required
-                                        className="w-full border px-3 py-2 rounded-lg text-black"
-                                    />
-                                </div>
-                                {/* 🆕 Upload Foto Buku (Multiple) */}
-                                <div>
-                                    <label className="block text-sm font-medium text-black">
-                                        Foto Buku
-                                    </label>
-                                    <input
-                                        type="file"
-                                        accept=".jpg,.jpeg,.png"
-                                        multiple
-                                        onChange={handleImageUpload}
-                                        className="w-full border px-3 py-2 rounded-lg text-black"
-                                    />
-
-                                    {/* Preview all uploaded images */}
-                                    {listBookAttachment.length > 0 && (
-                                        <div className="mt-3 grid grid-cols-3 gap-2">
-                                            {listBookAttachment.filter(img => !img.isDelete).map((img, idx) => (
-                                                <div key={idx} className="relative">
-                                                    <img
-                                                        src={formatImageSrc(img.fileBase64)}
-                                                        alt={`preview-${idx}`}
-                                                        className="h-24 w-full object-cover rounded-lg border"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setListBookAttachment((prev) => {
-                                                                const updated = [...prev];
-                                                                const target = updated[idx];
-
-                                                                // ✅ If it's a new upload → remove directly
-                                                                if (target.isNew) {
-                                                                    return updated.filter((_, i) => i !== idx);
-                                                                }
-
-                                                                // ✅ If it's an existing DB image → mark as deleted
-                                                                updated[idx] = { ...target, isDelete: true };
-                                                                return updated;
-                                                            });
-                                                        }}
-                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 text-xs"
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-
-                                <div className="flex justify-end gap-2 pt-4">
+                                <div className="md:col-span-2 flex justify-end gap-3 pt-6 border-t">
                                     <button
                                         type="button"
                                         onClick={handleCancel}
